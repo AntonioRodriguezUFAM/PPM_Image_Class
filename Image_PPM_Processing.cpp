@@ -43,6 +43,47 @@ bool border(int ii, int jj, int nr_lines, int nr_columns) {
         return false;
 }
 
+// New Filter Function Here!!
+
+// PPM Image Filter processing
+void invertColors(ppm& image, ppm& image2, int i, int j) {
+    int ii, jj, nr_lines, nr_columns, max_color , indx;
+    unsigned int r, g, b;
+   // float r_sum, g_sum, b_sum;
+
+    nr_lines = image.height;
+    nr_columns = image.width;
+    max_color = image.max_col_val;
+
+    //Apply the filter:
+    r = 0;
+    g = 0;
+    b = 0;
+
+    //check all  center  PIXEL Image
+    ii = i ;
+    jj = j;
+    if (border(ii, jj, nr_lines, nr_columns)) {
+        indx = ii * image.width + jj;
+
+        r = (unsigned int)image.r[indx];
+        g = (unsigned int)image.g[indx];
+        b = (unsigned int)image.b[indx];
+
+        r = max_color - r;
+        g = max_color - g;
+        b = max_color - b;
+
+    }
+    //Save the modifed pixel value in image2 
+    indx = i * image.width + j;
+    image2.r[indx] = (unsigned char)r;
+    image2.g[indx] = (unsigned char)g;
+    image2.b[indx] = (unsigned char)b;
+ 
+
+};
+
 //Blur the pixel at (i,j) using information from the neighbour pixels
 
 void process(ppm& image, ppm& image2, int i, int j) {
@@ -209,6 +250,9 @@ void tst(ppm& image, ppm& image2, int left, int right) {
         int ii = i / image.width;
         int jj = i - ii * image.width;
         process(image, image2, ii, jj);
+        // add new filter process Here!!
+        invertColors(image2, image, ii, jj);
+        process(image, image2, ii, jj);
     }
 }
 
@@ -218,25 +262,29 @@ int main() {
     // Imput images: fname
     // std::string fname = std::string("your_file_name.ppm");
     std::string fname = std::string("Images\\sample_5184×3456.ppm");
-    //std::string fname = std::string("Images/sample_1280×853.ppm");
-   // std::string fname = std::string("Images\\sample_640×426.ppm");
+   // std::string fname = std::string("Images/sample_1280×853.ppm");
+    //std::string fname = std::string("Images\\sample_640×426.ppm");
+    //std::string fname = std::string("Images\\Image.ppm");
     //*********************************************************
     // Output Image fnameout
     // std::string fnameout = std::string("your_file_name.ppm");
-    //std::string fnameout = std::string("Images\\Output\\Output_sample_640×426.ppm");
-   // std::string fnameout = std::string("Images/Output/Output_sample_1280×853.ppm");
-    std::string fnameout = std::string("Images/Output/Output_sample_5184×3456.ppm");
+    //std::string fnameout = std::string("Images\\Output\\INVERTCOLOROutput_sample_640×426.ppm");
+   std::string fnameout = std::string("Images/Output/INVERTEO11utput_sample_1280×853.ppm");
+   // std::string fnameout = std::string("Images/Output/OutputinvertInvertcolor_sample_5184×3456.ppm");
+     // std::string fnameout = std::string("Images/Output/O2utputImage.ppm");
 
     ppm image(fname);
     ppm image2(image.width, image.height);
 
     //Number of threads to use (the image will be divided between threads)
-    int parts = 40;
+    const int num_threads = thread::hardware_concurrency();
+    int parts = num_threads;
+    cout << "num_threads: " << num_threads << endl;
 
     std::vector<int>bnd = bounds(parts, image.size);
 
     std::vector<std::thread> tt(parts - 1);
-    //std::vector<std::thread> tt;
+   // std::vector<std::thread> tt;
 
     // Timer starts now
     auto start1 = high_resolution_clock::now();

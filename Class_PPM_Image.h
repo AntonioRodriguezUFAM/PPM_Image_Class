@@ -9,6 +9,13 @@
 //Process a binary PPM file
 //Process a binary PPM file
 
+// Structure Pixel 
+struct Pixel {
+    //int r, g, b;
+    unsigned charr, g, b;
+};
+
+
 class ppm {
     void init();
     //info about the PPM file (height and width)
@@ -16,6 +23,8 @@ class ppm {
     unsigned int nr_columns;
 
 public:
+    std::vector<Pixel> pixels;
+
     //arrays for storing the R,G,B values
     std::vector<unsigned char> r;
     std::vector<unsigned char> g;
